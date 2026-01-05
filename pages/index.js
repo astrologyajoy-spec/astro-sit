@@ -6,11 +6,15 @@ export default function Home() {
   const calculateLuck = (e) => {
     e.preventDefault();
     const name = e.target.name.value;
-    const dob = new Date(e.target.dob.value);
-    const month = dob.getMonth() + 1;
-    const day = dob.getDate();
+    const dob = e.target.dob.value;
+    const time = e.target.time.value;
+    const place = e.target.place.value;
+    
+    // রাশি নির্ণয়ের লজিক (Sun Sign)
+    const dateObj = new Date(dob);
+    const month = dateObj.getMonth() + 1;
+    const day = dateObj.getDate();
 
-    // ১. ওয়েস্টার্ন সূর্যরাশি (Sun Sign) লজিক
     let sunSign = "";
     if ((month == 3 && day >= 21) || (month == 4 && day <= 19)) sunSign = "মেষ (Aries)";
     else if ((month == 4 && day >= 20) || (month == 5 && day <= 20)) sunSign = "বৃষ (Taurus)";
@@ -25,41 +29,42 @@ export default function Home() {
     else if ((month == 1 && day >= 20) || (month == 2 && day <= 18)) sunSign = "কুম্ভ (Aquarius)";
     else sunSign = "মীন (Pisces)";
 
-    // ২. পঞ্জিকা/বৈদিক চন্দ্ররাশি (Moon Sign - আনুমানিক লজিক)
-    // সঠিক পঞ্জিকা গণনার জন্য জটিল API লাগে, তবে আমরা ইউজারকে অপশন দিতে পারি
-    let moonSign = "পঞ্জিকা অনুযায়ী আপনার চন্দ্ররাশি ভিন্ন হতে পারে (যেমন: কর্কট)";
-
     const fortunes = [
-      "আজকের দিনে আপনার বিদেশ যাত্রার বা নতুন যোগাযোগের সম্ভাবনা আছে।",
-      "আর্থিক দিক থেকে দিনটি অত্যন্ত শুভ ও লাভদায়ক।",
-      "পুরনো কোনো সমস্যার সমাধান হতে পারে আজ।",
-      "কর্মক্ষেত্রে আপনার প্রভাব ও প্রতিপত্তি বাড়বে।"
+      "আপনার জন্মস্থান ও সময়ের সংযোগ আজ আপনার জন্য শুভ বার্তা বয়ে আনবে।",
+      "আজকের দিনে নতুন কোনো পরিকল্পনা শুরু করার জন্য চমৎকার সময়।",
+      "আর্থিক ও মানসিকভাবে আপনি আজ বেশ শক্তিশালী অনুভব করবেন।",
+      "পরিবার বা বন্ধুদের সাথে একটি আনন্দদায়ক সময় কাটানোর যোগ আছে।"
     ];
     const randomFortune = fortunes[Math.floor(Math.random() * fortunes.length)];
 
-    setResult({ name, sunSign, moonSign, fortune: randomFortune });
+    setResult({ name, sunSign, dob, time, place, fortune: randomFortune });
   };
 
   return (
-    <div style={{ textAlign: 'center', padding: '50px', background: '#0a0a1a', color: 'white', minHeight: '100vh', fontFamily: 'Arial' }}>
-      <h1>🌌 আন্তর্জাতিক ও বৈদিক ভাগ্যফল ২০২৬ 🌌</h1>
+    <div style={{ textAlign: 'center', padding: '40px', background: '#050510', color: 'white', minHeight: '100vh', fontFamily: 'Arial' }}>
+      <h1 style={{ color: '#f1c40f' }}>✨ প্রফেশনাল ভাগ্য গণনা ২০২৬ ✨</h1>
       
       {!result ? (
-        <form onSubmit={calculateLuck} style={{ background: '#1c1c3c', padding: '30px', borderRadius: '20px', boxShadow: '0 0 20px rgba(255,255,255,0.1)' }}>
-          <input type="text" name="name" placeholder="আপনার নাম" required style={{ padding: '12px', width: '280px', marginBottom: '15px', borderRadius: '8px' }} /><br/>
-          <input type="date" name="dob" required style={{ padding: '12px', width: '280px', marginBottom: '15px', borderRadius: '8px' }} /><br/>
-          <button type="submit" style={{ padding: '15px 40px', background: '#f39c12', color: 'black', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>আপনার ভাগ্য দেখুন</button>
+        <form onSubmit={calculateLuck} style={{ background: '#111125', padding: '30px', borderRadius: '20px', display: 'inline-block', border: '1px solid #333' }}>
+          <input type="text" name="name" placeholder="পুরো নাম" required style={{ padding: '12px', width: '280px', marginBottom: '15px', borderRadius: '5px' }} /><br/>
+          <input type="date" name="dob" required style={{ padding: '12px', width: '280px', marginBottom: '15px', borderRadius: '5px' }} /><br/>
+          <input type="time" name="time" required style={{ padding: '12px', width: '280px', marginBottom: '15px', borderRadius: '5px' }} /><br/>
+          <input type="text" name="place" placeholder="জন্মস্থান (শহর/জেলা)" required style={{ padding: '12px', width: '280px', marginBottom: '15px', borderRadius: '5px' }} /><br/>
+          <button type="submit" style={{ padding: '15px 40px', background: '#f1c40f', color: 'black', border: 'none', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold' }}>নিখুঁত ফলাফল দেখুন</button>
         </form>
       ) : (
-        <div style={{ background: '#16213e', padding: '40px', borderRadius: '20px', border: '2px solid #f39c12' }}>
-          <h2>স্বাগতম {result.name}!</h2>
-          <hr style={{ borderColor: '#f39c12' }} />
-          <div style={{ margin: '20px 0' }}>
-            <p>🌍 <strong>আন্তর্জাতিক (সূর্যরাশি):</strong> {result.sunSign}</p>
-            <p>☸️ <strong>ভারতীয় পঞ্জিকা (চন্দ্ররাশি):</strong> ৪ঠা এপ্রিল রাত ৮:৩০ এর ক্ষেত্রে এটি 'কর্কট' হবে।</p>
+        <div style={{ background: '#1a1a3a', padding: '40px', borderRadius: '20px', border: '2px solid #f1c40f', maxWidth: '500px', margin: 'auto' }}>
+          <h2>ফলাফল: {result.name}</h2>
+          <hr/>
+          <p>📅 <strong>জন্ম তারিখ:</strong> {result.dob}</p>
+          <p>⏰ <strong>জন্ম সময়:</strong> {result.time}</p>
+          <p>📍 <strong>জন্মস্থান:</strong> {result.place}</p>
+          <p>🌟 <strong>রাশি:</strong> {result.sunSign}</p>
+          <div style={{ marginTop: '20px', padding: '15px', background: '#f1c40f', color: 'black', borderRadius: '10px' }}>
+            <strong>আজকের ভাগ্যফল:</strong><br/>
+            "{result.fortune}"
           </div>
-          <p style={{ fontSize: '20px', color: '#f39c12' }}>" {result.fortune} "</p>
-          <button onClick={() => setResult(null)} style={{ marginTop: '20px', color: 'white', background: 'none', border: '1px solid white', padding: '8px 15px' }}>নতুন করে দেখুন</button>
+          <button onClick={() => setResult(null)} style={{ marginTop: '20px', color: 'white', background: 'none', border: '1px solid white', padding: '10px' }}>আবার দেখুন</button>
         </div>
       )}
     </div>
