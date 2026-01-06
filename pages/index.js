@@ -1,16 +1,16 @@
 import { useState } from 'react';
 import Link from 'next/link';
-import Header from '../components/Header'; // হেডার ইনক্লুড করা হলো
-import Footer from '../components/Footer'; // ফুটার ইনক্লুড করা হলো
+import Header from '../components/Header';
+import Footer from '../components/Footer';
 
 export default function Home() {
-  // মেনু আইটেম লিস্ট
+  // English Menu Items
   const menuItems = [
-    { name: "দৈনিক রাশিফল", link: "/rashi", icon: "🌌" },
-    { name: "হস্তরেখা বিচার (AI)", link: "/palmistry", icon: "✋" },
-    { name: "বাস্তু বিশ্লেষণ", link: "/vastu", icon: "🏠" },
-    { name: "যোটক বিচার", link: "/match", icon: "💑" },
-    { name: "সংখ্যাতত্ত্ব", link: "/numerology", icon: "🔢" },
+    { name: "Daily Horoscope", link: "/rashi", icon: "🌌" },
+    { name: "Palm Reading (AI)", link: "/palmistry", icon: "✋" },
+    { name: "Vastu Analysis", link: "/vastu", icon: "🏠" },
+    { name: "Match Making", link: "/match", icon: "💑" },
+    { name: "Numerology", link: "/numerology", icon: "🔢" },
   ];
 
   return (
@@ -22,10 +22,10 @@ export default function Home() {
       color: '#fff',
       fontFamily: "'Poppins', sans-serif"
     }}>
-      {/* ১. হেডার কম্পোনেন্ট */}
+      {/* 1. Header Component */}
       <Header />
 
-      {/* ২. মেইন কন্টেন্ট সেকশন */}
+      {/* 2. Main Content */}
       <main style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '60px 20px' }}>
         <header style={{ textAlign: 'center', marginBottom: '50px' }}>
           <h1 style={{ 
@@ -37,14 +37,14 @@ export default function Home() {
             ASTRO AI GURU
           </h1>
           <p style={{ color: '#bdc3c7', fontSize: '1.2rem', letterSpacing: '1px' }}>
-            ভবিষ্যতের সঠিক পথ দেখাবে কৃত্রিম বুদ্ধিমত্তা
+            Predicting Your Future with Artificial Intelligence
           </p>
         </header>
 
-        {/* সার্ভিস মেনু গ্রিড */}
+        {/* Professional Menu Grid */}
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
           gap: '25px',
           width: '100%',
           maxWidth: '900px',
@@ -80,7 +80,7 @@ export default function Home() {
         </div>
       </main>
 
-      {/* ৩. ফুটার কম্পোনেন্ট */}
+      {/* 3. Footer Component */}
       <Footer />
     </div>
   );
