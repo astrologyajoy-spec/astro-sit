@@ -10,85 +10,117 @@ export default function Home() {
     const time = e.target.time.value;
 
     const date = new Date(`${dob}T${time}`);
-    const year = date.getFullYear();
     const month = date.getMonth() + 1;
     const day = date.getDate();
-    const hour = date.getHours();
-    const min = date.getMinutes();
 
-    // 1. Sun Sign (Western)
+    // Standard Sun Sign Logic
     let sunSign = "";
-    if ((month == 3 && day >= 21) || (month == 4 && day <= 19)) sunSign = "Mesh (Aries)";
-    else if ((month == 4 && day >= 20) || (month == 5 && day <= 20)) sunSign = "Vrish (Taurus)";
-    else if ((month == 5 && day >= 21) || (month == 6 && day <= 20)) sunSign = "Mithun (Gemini)";
-    else if ((month == 6 && day >= 21) || (month == 7 && day <= 22)) sunSign = "Karkat (Cancer)";
-    else if ((month == 7 && day >= 23) || (month == 8 && day <= 22)) sunSign = "Singha (Leo)";
-    else if ((month == 8 && day >= 23) || (month == 9 && day <= 22)) sunSign = "Kanya (Virgo)";
-    else if ((month == 9 && day >= 23) || (month == 10 && day <= 22)) sunSign = "Tula (Libra)";
-    else if ((month == 10 && day >= 23) || (month == 11 && day <= 21)) sunSign = "Vrischika (Scorpio)";
-    else if ((month == 11 && day >= 22) || (month == 12 && day <= 21)) sunSign = "Dhanu (Sagittarius)";
-    else if ((month == 12 && day >= 22) || (month == 1 && day <= 19)) sunSign = "Makara (Capricorn)";
-    else if ((month == 1 && day >= 20) || (month == 2 && day <= 18)) sunSign = "Kumbha (Aquarius)";
-    else sunSign = "Meena (Pisces)";
+    if ((month == 3 && day >= 21) || (month == 4 && day <= 19)) sunSign = "Aries (Mesh)";
+    else if ((month == 4 && day >= 20) || (month == 5 && day <= 20)) sunSign = "Taurus (Vrish)";
+    else if ((month == 5 && day >= 21) || (month == 6 && day <= 20)) sunSign = "Gemini (Mithun)";
+    else if ((month == 6 && day >= 21) || (month == 7 && day <= 22)) sunSign = "Cancer (Karkat)";
+    else if ((month == 7 && day >= 23) || (month == 8 && day <= 22)) sunSign = "Leo (Singha)";
+    else if ((month == 8 && day >= 23) || (month == 9 && day <= 22)) sunSign = "Virgo (Kanya)";
+    else if ((month == 9 && day >= 23) || (month == 10 && day <= 22)) sunSign = "Libra (Tula)";
+    else if ((month == 10 && day >= 23) || (month == 11 && day <= 21)) sunSign = "Scorpio (Vrischika)";
+    else if ((month == 11 && day >= 22) || (month == 12 && day <= 21)) sunSign = "Sagittarius (Dhanu)";
+    else if ((month == 12 && day >= 22) || (month == 1 && day <= 19)) sunSign = "Capricorn (Makara)";
+    else if ((month == 1 && day >= 20) || (month == 2 && day <= 18)) sunSign = "Aquarius (Kumbha)";
+    else sunSign = "Pisces (Meena)";
 
-    // 2. Moon Sign Algorithm (Vedic Estimation)
-    const julianDate = (d, m, y) => {
-      if (m <= 2) { y -= 1; m += 12; }
-      let a = Math.floor(y / 100);
-      let b = 2 - a + Math.floor(a / 4);
-      return Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m + 1)) + d + b - 1524.5;
-    };
-
-    const jd = julianDate(day, month, year) + (hour + min / 60) / 24;
-    const daysSinceEpoch = jd - 2451545.0;
-    
-    // Moon's Mean Longitude (Advanced Formula)
-    let moonLong = 218.316 + 13.176396 * daysSinceEpoch;
-    moonLong = moonLong % 360;
-    if (moonLong < 0) moonLong += 360;
-
-    // Ayanamsa Correction (Indian Panjika System)
-    const ayanamsa = 23.5 + (0.000001 * daysSinceEpoch); // Lahiri Ayanamsa estimation
-    let vedicLong = (moonLong - ayanamsa) % 360;
-    if (vedicLong < 0) vedicLong += 360;
-
-    const moonSigns = ["Mesh", "Vrish", "Mithun", "Karkat", "Singha", "Kanya", "Tula", "Vrischika", "Dhanu", "Makara", "Kumbha", "Meena"];
-    const moonIndex = Math.floor(vedicLong / 30);
-    const moonSign = moonSigns[moonIndex];
-
-    const fortunes = [
-        "Aj apnar somoy khub bhalo. Ortho uparjoner notun dik khulte pare.",
-        "Poribarer sathe bhalo somoy katbe, kintu svasther dike nojor rakhun.",
-        "Karmokhetre notun daitwo pete paren. Bondhuder sahajyo paben.",
-        "Ajker dine kono boro biniyog na করাই bhalo hobe."
-    ];
-    const randomFortune = fortunes[Math.floor(Math.random() * fortunes.length)];
-
-    setResult({ name, sunSign, moonSign, fortune: randomFortune });
+    setResult({ name, sunSign, dob, time });
   };
 
   return (
-    <div style={{ textAlign: 'center', padding: '50px', background: '#0a0a2a', color: 'white', minHeight: '100vh', fontFamily: 'Arial' }}>
-      <h1 style={{color: '#f1c40f'}}>🌠 Global Astrology 2026 🌠</h1>
+    <div style={{
+      background: 'radial-gradient(circle at center, #1b2735 0%, #090a0f 100%)',
+      color: '#fff',
+      minHeight: '100vh',
+      fontFamily: "'Poppins', sans-serif",
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      padding: '40px 20px'
+    }}>
+      {/* Header */}
+      <header style={{ textAlign: 'center', marginBottom: '40px' }}>
+        <h1 style={{ fontSize: '3rem', color: '#f1c40f', textShadow: '0 0 10px rgba(241, 196, 15, 0.5)' }}>
+          ASTRO AI GURU
+        </h1>
+        <p style={{ color: '#bdc3c7', fontSize: '1.1rem' }}>Sothik Bhobisyot, Ebar Apnar Hater Muthoy</p>
+      </header>
+
+      {/* Main Content */}
       {!result ? (
-        <form onSubmit={calculateSigns} style={{ background: '#161632', padding: '30px', borderRadius: '20px', display: 'inline-block', border: '1px solid #f1c40f' }}>
-          <input type="text" name="name" placeholder="Name" required style={{ padding: '10px', marginBottom: '10px', width: '250px', borderRadius: '5px' }} /><br/>
-          <input type="date" name="dob" required style={{ padding: '10px', marginBottom: '10px', width: '250px', borderRadius: '5px' }} /><br/>
-          <input type="time" name="time" required style={{ padding: '10px', marginBottom: '10px', width: '250px', borderRadius: '5px' }} /><br/>
-          <button type="submit" style={{ padding: '12px 30px', background: '#f1c40f', color: 'black', fontWeight: 'bold', borderRadius: '5px', cursor: 'pointer' }}>Check Fate</button>
-        </form>
+        <div style={{
+          background: 'rgba(255, 255, 255, 0.05)',
+          backdropFilter: 'blur(10px)',
+          padding: '40px',
+          borderRadius: '24px',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+          boxShadow: '0 20px 50px rgba(0,0,0,0.5)',
+          width: '100%',
+          maxWidth: '450px'
+        }}>
+          <form onSubmit={calculateSigns}>
+            <div style={{ marginBottom: '20px' }}>
+              <label style={{ display: 'block', marginBottom: '8px', color: '#f1c40f' }}>Apnar Nam</label>
+              <input type="text" name="name" required style={{ width: '100%', padding: '12px', borderRadius: '12px', border: 'none', background: 'rgba(255,255,255,0.1)', color: '#fff', outline: 'none' }} placeholder="Ex: Rahul Das" />
+            </div>
+            
+            <div style={{ marginBottom: '20px' }}>
+              <label style={{ display: 'block', marginBottom: '8px', color: '#f1c40f' }}>Jonmo Tarikh</label>
+              <input type="date" name="dob" required style={{ width: '100%', padding: '12px', borderRadius: '12px', border: 'none', background: 'rgba(255,255,255,0.1)', color: '#fff' }} />
+            </div>
+
+            <div style={{ marginBottom: '30px' }}>
+              <label style={{ display: 'block', marginBottom: '8px', color: '#f1c40f' }}>Jonmo Somoy</label>
+              <input type="time" name="time" required style={{ width: '100%', padding: '12px', borderRadius: '12px', border: 'none', background: 'rgba(255,255,255,0.1)', color: '#fff' }} />
+            </div>
+
+            <button type="submit" style={{
+              width: '100%',
+              padding: '16px',
+              borderRadius: '12px',
+              border: 'none',
+              background: 'linear-gradient(45deg, #f1c40f, #f39c12)',
+              color: '#000',
+              fontWeight: '700',
+              fontSize: '1.1rem',
+              cursor: 'pointer',
+              transition: '0.3s transform'
+            }}>
+              BHAGYO DEKHUN
+            </button>
+          </form>
+        </div>
       ) : (
-        <div style={{ background: '#1c1c44', padding: '40px', borderRadius: '20px', border: '2px solid #f1c40f', maxWidth: '500px', margin: 'auto' }}>
-          <h2>Result for {result.name}</h2>
-          <hr/>
-          <p>🌍 <b>Western (Sun Sign):</b> {result.sunSign}</p>
-          <p>🌙 <b>Vedic (Moon Sign):</b> {result.moonSign}</p>
-          <div style={{ marginTop: '20px', padding: '15px', background: '#f1c40f', color: 'black', borderRadius: '10px' }}>
-            <b>Fortune:</b><br/> "{result.fortune}"
+        <div style={{
+          background: 'rgba(255, 255, 255, 0.05)',
+          backdropFilter: 'blur(15px)',
+          padding: '40px',
+          borderRadius: '24px',
+          border: '2px solid #f1c40f',
+          textAlign: 'center',
+          maxWidth: '500px'
+        }}>
+          <h2 style={{ color: '#f1c40f' }}>Swa-gotom, {result.name}!</h2>
+          <div style={{ margin: '30px 0', textAlign: 'left' }}>
+            <div style={{ background: 'rgba(241, 196, 15, 0.1)', padding: '15px', borderRadius: '12px', marginBottom: '10px' }}>
+              <strong>🌍 Surjo Rashi:</strong> {result.sunSign}
+            </div>
+            <p style={{ fontSize: '0.9rem', color: '#bdc3c7' }}>*Chandr-o rashi ebong baki folafor gulo 2nd step-e add kora hobe.</p>
           </div>
-          <button onClick={() => setResult(null)} style={{ marginTop: '20px', color: 'white', background: 'none', border: '1px solid white', padding: '10px', cursor: 'pointer' }}>Try Again</button>
+          <button onClick={() => setResult(null)} style={{ background: 'none', border: '1px solid #fff', color: '#fff', padding: '10px 20px', borderRadius: '8px', cursor: 'pointer' }}>
+            Back
+          </button>
         </div>
       )}
+
+      {/* Footer Info */}
+      <footer style={{ marginTop: 'auto', paddingTop: '40px', color: '#555', fontSize: '0.8rem' }}>
+        © 2026 ASTRO AI GURU | Made for the Universe
+      </footer>
     </div>
   );
 }
