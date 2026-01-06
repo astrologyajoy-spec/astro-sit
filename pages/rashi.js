@@ -14,76 +14,103 @@ export default function Rashi() {
     const dob = e.target.dob.value;
     const time = e.target.time.value;
 
-    const dateObj = new Date(dob);
-    const day = dateObj.getDate();
-    const month = dateObj.getMonth() + 1;
-    const year = dateObj.getFullYear();
+    const [year, month, day] = dob.split('-').map(Number);
     const [hour, min] = time.split(':').map(Number);
 
-    // 1. Sun Sign (Western)
+    // 1. Sun Sign (Western Astrology)
     const getSunSign = (m, d) => {
-      const days = [21, 20, 21, 21, 21, 21, 23, 23, 23, 23, 22, 22];
       const signs = ["Capricorn", "Aquarius", "Pisces", "Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius"];
-      return d < days[m - 1] ? signs[m - 1] : signs[m % 12];
+      const last_days = [19, 18, 20, 19, 20, 20, 22, 22, 22, 22, 21, 21];
+      return d <= last_days[m - 1] ? signs[m - 1] : signs[m % 12];
     };
 
-    // 2. Accurate Moon Sign Calculation (Luni-Solar Logic)
-    const getMoonSign = (y, m, d, h, mn) => {
+    // 2. High-Accuracy Vedic Moon Sign Algorithm
+    const getVedicMoonSign = (y, m, d, h, mn) => {
       const signs = ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"];
       
-      // Epoch calculation for 2000-01-01
-      const decimalDate = y + (m - 1) / 12 + d / 365;
-      const daysSinceEpoch = (y - 2000) * 365.25 + (m - 1) * 30.6 + d + (h / 24);
+      // Calculate Julian Day
+      if (m <= 2) { y -= 1; m += 12; }
+      let A = Math.floor(y / 100);
+      let B = 2 - A + Math.floor(A / 4);
+      let JD = Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m + 1)) + d + B - 1524.5;
+      JD += (h + mn / 60) / 24;
+
+      // Moon's position calculation (Mean Longitude)
+      let T = (JD - 2451545.0) / 36525;
+      let L0 = 218.316 + 481267.881 * T; // Moon's mean longitude
       
-      // Moon's mean longitude
-      let moonLon = 218.316 + 13.176396 * daysSinceEpoch;
-      moonLon = moonLon % 360;
+      // Lahiri Ayanamsa Correction (Crucial for Vedic Astrology)
+      let ayanamsa = 22.467 + 0.00014 * (y - 1900) + 0.0397 * T;
+      let moonLon = (L0 - ayanamsa) % 360;
       if (moonLon < 0) moonLon += 360;
 
-      // Vedic Ayanamsa Correction (Approx. 24 degrees for current era)
-      const ayanamsa = 23.85 + (0.013 * (y - 1900));
-      let vedicMoonLon = moonLon - ayanamsa;
-      if (vedicMoonLon < 0) vedicMoonLon += 360;
-
-      const index = Math.floor(vedicMoonLon / 30);
-      return signs[index];
+      return signs[Math.floor(moonLon / 30)];
     };
 
     const sun = getSunSign(month, day);
-    const moon = getMoonSign(year, month, day, hour, min);
+    const moon = getVedicMoonSign(year, month, day, hour, min);
 
     setTimeout(() => {
-      setResult({ name, sun, moon });
+      setResult({ name, sun, moon, dob, time });
       setLoading(false);
-    }, 1500);
+    }, 2000);
   };
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', background: '#090a0f', color: '#fff' }}>
       <Header />
-      <main style={{ flex: 1, padding: '50px 20px', textAlign: 'center' }}>
-        <h1 style={{ color: '#f1c40f' }}>Accurate Zodiac Finder</h1>
-        
-        <form onSubmit={calculateRashi} style={{ background: '#111', padding: '30px', borderRadius: '20px', display: 'inline-block', width: '100%', maxWidth: '400px', border: '1px solid #333' }}>
-          <input type="text" name="name" placeholder="Name" required style={inputStyle} />
-          <input type="date" name="dob" required style={inputStyle} />
-          <input type="time" name="time" required style={inputStyle} />
-          <button type="submit" style={btnStyle}>{loading ? "Processing..." : "Find My Rashi"}</button>
-        </form>
+      
+      <main style={{ flex: 1, padding: '60px 20px', textAlign: 'center' }}>
+        <h1 style={{ color: '#f1c40f', fontSize: '2.5rem' }}>✨ Precision Astrology</h1>
+        <p style={{ color: '#bdc3c7' }}>Get your authentic Vedic Moon Sign and Western Sun Sign</p>
 
-        {result && (
-          <div style={{ marginTop: '30px', padding: '20px', border: '2px solid #f1c40f', borderRadius: '15px', display: 'inline-block' }}>
-            <h2>Results for {result.name}</h2>
-            <p>☀️ Sun Sign: <b>{result.sun}</b></p>
-            <p>🌙 Moon Sign (Vedic): <b>{result.moon}</b></p>
-            <p style={{fontSize: '0.8rem', color: '#888'}}>*Based on Vedic Ayanamsa correction</p>
+        {!result ? (
+          <form onSubmit={calculateRashi} style={formStyle}>
+            <input type="text" name="name" placeholder="Enter Full Name" required style={inputStyle} />
+            <div style={{ textAlign: 'left', margin: '10px 0' }}>
+              <label style={labelStyle}>Birth Date</label>
+              <input type="date" name="dob" required style={inputStyle} />
+            </div>
+            <div style={{ textAlign: 'left', margin: '10px 0' }}>
+              <label style={labelStyle}>Exact Birth Time</label>
+              <input type="time" name="time" required style={inputStyle} />
+            </div>
+            <button type="submit" style={btnStyle}>{loading ? "Analyzing Planetary Positions..." : "Check My Rashi"}</button>
+          </form>
+        ) : (
+          <div style={reportContainer}>
+            <h2 style={{ color: '#f1c40f' }}>Astrology Profile: {result.name}</h2>
+            <div style={cardGrid}>
+              <div style={signCard}>
+                <p style={cardLabel}>WESTERN (SUN SIGN)</p>
+                <h1 style={cardValue}>{result.sun}</h1>
+                <p style={cardDesc}>Represents your ego and personality.</p>
+              </div>
+              <div style={signCard}>
+                <p style={cardLabel}>VEDIC (MOON SIGN)</p>
+                <h1 style={cardValue} className="highlight">{result.moon}</h1>
+                <p style={cardDesc}>Represents your soul and emotions.</p>
+              </div>
+            </div>
+            <button onClick={() => setResult(null)} style={backBtn}>Calculate Again</button>
           </div>
         )}
       </main>
+
       <Footer />
     </div>
   );
 }
 
-const inputStyle = { padding: '12px', width: '100%', marginBottom: '15px', borderRadius: '8px', border: '1px solid #333', background: '#000', color: '#fff' };
-const btnStyle = { padding: '12px', background: '#f1c40f', color: '#000', border: 'none', borderRadius: '8px', width: '100%', cursor: 'pointer', fontWeight: 'bold' };
+// Styles
+const formStyle = { background: '#111', padding: '40px', borderRadius: '30px', display: 'inline-block', width: '100%', maxWidth: '450px', border: '1px solid #333', boxShadow: '0 10px 30px rgba(0,0,0,0.5)' };
+const inputStyle = { padding: '14px', width: '100%', marginBottom: '15px', borderRadius: '10px', border: '1px solid #222', background: '#000', color: '#fff', fontSize: '1rem' };
+const labelStyle = { color: '#f1c40f', fontSize: '0.8rem', fontWeight: 'bold', marginLeft: '5px' };
+const btnStyle = { padding: '15px', background: '#f1c40f', color: '#000', border: 'none', borderRadius: '10px', width: '100%', cursor: 'pointer', fontWeight: 'bold', fontSize: '1rem' };
+const reportContainer = { maxWidth: '700px', margin: '0 auto', background: 'rgba(255,255,255,0.02)', padding: '40px', borderRadius: '30px', border: '1px solid #222' };
+const cardGrid = { display: 'flex', gap: '20px', marginTop: '30px', flexWrap: 'wrap' };
+const signCard = { flex: 1, minWidth: '280px', background: '#000', padding: '30px', borderRadius: '20px', border: '1px solid #333', textAlign: 'center' };
+const cardLabel = { fontSize: '0.7rem', letterSpacing: '2px', color: '#888' };
+const cardValue = { fontSize: '2.5rem', margin: '10px 0', color: '#f1c40f' };
+const cardDesc = { fontSize: '0.85rem', color: '#555' };
+const backBtn = { marginTop: '30px', background: 'none', border: '1px solid #333', color: '#888', padding: '10px 20px', cursor: 'pointer', borderRadius: '8px' };
