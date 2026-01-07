@@ -4,37 +4,47 @@ import Footer from '../components/Footer';
 
 export default function Vastu() {
   const [report, setReport] = useState(null);
+  
+  // ৯টি জোনের জন্য স্টেট (North-West to South-East)
+  const [grid, setGrid] = useState(Array(9).fill("Empty"));
 
-  const analyzeVastu = (e) => {
-    e.preventDefault();
-    const entrance = e.target.entrance.value;
-    const kitchen = e.target.kitchen.value;
-    const bedroom = e.target.bedroom.value;
+  const zones = [
+    "North-West", "North", "North-East",
+    "West", "Center (Brahmasthan)", "East",
+    "South-West", "South", "South-East"
+  ];
 
-    // Vastu Logic Simulation
-    let score = 0;
+  const items = ["Empty", "Kitchen", "Toilet", "Master Bedroom", "Pooja Room", "Living Room", "Staircase", "Main Entrance"];
+
+  const handleSelect = (index, value) => {
+    const newGrid = [...grid];
+    newGrid[index] = value;
+    setGrid(newGrid);
+  };
+
+  const analyzeGridVastu = () => {
     let suggestions = [];
+    let score = 100;
 
-    if (entrance === "North" || entrance === "East") {
-      score += 35;
-      suggestions.push("✅ Entrance is in a very auspicious direction.");
-    } else {
-      suggestions.push("❌ Main entrance could be better in North or East.");
+    // কিছু গুরুত্বপূর্ণ বাস্তু লজিক
+    if (grid[2] !== "Pooja Room" && grid[2] !== "Empty") {
+      suggestions.push("⚠️ North-East (Ishanya): Best for Pooja Room. Avoid Toilet/Kitchen here.");
+      score -= 15;
+    }
+    if (grid[8] !== "Kitchen" && grid[8] !== "Empty") {
+      suggestions.push("⚠️ South-East (Agneya): Ideal for Kitchen (Fire zone).");
+      score -= 15;
+    }
+    if (grid[6] !== "Master Bedroom" && grid[6] !== "Empty") {
+      suggestions.push("⚠️ South-West (Nairutya): Best for Master Bedroom or heavy items.");
+      score -= 15;
+    }
+    if (grid[1] === "Toilet" || grid[4] === "Toilet") {
+      suggestions.push("❌ Center or North: Toilet here can cause health or financial blockages.");
+      score -= 20;
     }
 
-    if (kitchen === "South-East") {
-      score += 35;
-      suggestions.push("✅ Kitchen is perfectly placed in the Fire zone.");
-    } else {
-      suggestions.push("❌ Kitchen in " + kitchen + " may cause health or financial issues.");
-    }
-
-    if (bedroom === "South-West") {
-      score += 30;
-      suggestions.push("✅ Master Bedroom is in the correct stability zone.");
-    } else {
-      suggestions.push("❌ Consider moving the Master Bedroom to the South-West.");
-    }
+    if (suggestions.length === 0) suggestions.push("✅ Your basic layout looks Vastu compliant!");
 
     setReport({ score, suggestions });
   };
@@ -43,58 +53,55 @@ export default function Vastu() {
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', background: '#090a0f', color: '#fff' }}>
       <Header />
       
-      <main style={{ flex: 1, padding: '50px 20px', textAlign: 'center' }}>
-        <h1 style={{ color: '#f1c40f', fontSize: '2.5rem' }}>AI Vastu Consultant</h1>
-        <p style={{ color: '#bdc3c7' }}>Check the energy flow of your home instantly</p>
+      <main style={{ flex: 1, padding: '40px 20px', textAlign: 'center' }}>
+        <h1 style={{ color: '#f1c40f' }}>Interactive Vastu Grid Analysis</h1>
+        <p style={{ color: '#bdc3c7', marginBottom: '30px' }}>Select items in each direction of your home layout</p>
 
         
 
-        <form onSubmit={analyzeVastu} style={formStyle}>
-          <div style={inputGroup}>
-            <label style={labelStyle}>Main Entrance Direction:</label>
-            <select name="entrance" style={selectStyle}>
-              <option>North</option>
-              <option>South</option>
-              <option>East</option>
-              <option>West</option>
-              <option>North-East</option>
-            </select>
-          </div>
+        {/* ৩x৩ বর্গাকার গ্রিড */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(3, 1fr)',
+          gap: '10px',
+          maxWidth: '500px',
+          margin: '0 auto',
+          background: '#222',
+          padding: '15px',
+          borderRadius: '15px',
+          border: '2px solid #f1c40f'
+        }}>
+          {grid.map((cell, index) => (
+            <div key={index} style={{
+              background: '#000',
+              padding: '10px',
+              borderRadius: '8px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '5px'
+            }}>
+              <span style={{ fontSize: '0.7rem', color: '#f1c40f' }}>{zones[index]}</span>
+              <select 
+                onChange={(e) => handleSelect(index, e.target.value)}
+                style={{ background: '#111', color: '#fff', border: '1px solid #444', fontSize: '0.8rem', padding: '5px' }}
+              >
+                {items.map(item => <option key={item} value={item}>{item}</option>)}
+              </select>
+            </div>
+          ))}
+        </div>
 
-          <div style={inputGroup}>
-            <label style={labelStyle}>Kitchen Location:</label>
-            <select name="kitchen" style={selectStyle}>
-              <option>South-East</option>
-              <option>North-West</option>
-              <option>North-East</option>
-              <option>South-West</option>
-            </select>
-          </div>
-
-          <div style={inputGroup}>
-            <label style={labelStyle}>Master Bedroom Location:</label>
-            <select name="bedroom" style={selectStyle}>
-              <option>South-West</option>
-              <option>North-East</option>
-              <option>South-East</option>
-              <option>North-West</option>
-            </select>
-          </div>
-
-          <button type="submit" style={btnStyle}>Analyze My Home</button>
-        </form>
+        <button onClick={analyzeGridVastu} style={{
+          marginTop: '30px', padding: '15px 40px', background: '#f1c40f', 
+          color: '#000', fontWeight: 'bold', border: 'none', borderRadius: '10px', cursor: 'pointer'
+        }}>Analyze Layout</button>
 
         {report && (
-          <div style={reportBox}>
-            <h2 style={{ color: '#f1c40f' }}>Vastu Compliance Score: {report.score}%</h2>
+          <div style={{ marginTop: '40px', background: 'rgba(241, 196, 15, 0.1)', padding: '30px', borderRadius: '20px', border: '1px solid #f1c40f', maxWidth: '600px', margin: '30px auto' }}>
+            <h2>Vastu Score: {report.score}/100</h2>
             <div style={{ textAlign: 'left', marginTop: '20px' }}>
-              {report.suggestions.map((s, i) => (
-                <p key={i} style={{ marginBottom: '10px' }}>{s}</p>
-              ))}
+              {report.suggestions.map((s, i) => <p key={i} style={{ marginBottom: '10px' }}>{s}</p>)}
             </div>
-            <p style={{ fontSize: '0.9rem', color: '#888', marginTop: '20px' }}>
-              *This is an AI-generated basic analysis. For serious issues, consult a professional.
-            </p>
           </div>
         )}
       </main>
@@ -103,14 +110,3 @@ export default function Vastu() {
     </div>
   );
 }
-
-// Styles
-const formStyle = {
-  background: 'rgba(255,255,255,0.03)', padding: '30px', borderRadius: '20px',
-  display: 'inline-block', width: '100%', maxWidth: '500px', border: '1px solid #333', marginTop: '30px'
-};
-const inputGroup = { marginBottom: '20px', textAlign: 'left' };
-const labelStyle = { display: 'block', marginBottom: '8px', color: '#f1c40f', fontWeight: 'bold' };
-const selectStyle = { width: '100%', padding: '12px', borderRadius: '8px', background: '#000', color: '#fff', border: '1px solid #444' };
-const btnStyle = { width: '100%', padding: '15px', background: '#f1c40f', color: '#000', fontWeight: 'bold', border: 'none', borderRadius: '10px', cursor: 'pointer' };
-const reportBox = { marginTop: '40px', padding: '30px', border: '2px solid #f1c40f', borderRadius: '20px', maxWidth: '600px', margin: '40px auto', background: '#111' };
