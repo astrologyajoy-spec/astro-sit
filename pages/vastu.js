@@ -106,7 +106,22 @@ export default function Vastu() {
         </div>
 
         <button onClick={analyzeVastu} style={submitBtnStyle}>Calculate Full Vastu Score</button>
+// ... আগের analyzeVastu ফাংশন ...
+  const analyzeVastu = () => {
+    // ... আপনার বিদ্যমান কোড ...
+    setReport({ score: Math.max(0, Math.min(totalScore, 100)), analysis: finalAnalysis });
+  };
 
+  // --- এখানে নতুন AI ফাংশনটি যোগ করুন ---
+  const handleAiAnalysis = async () => {
+    const response = await fetch('/api/gemini', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ data: selections }), // selections হচ্ছে আপনার বর্তমান ডাটা
+    });
+    const result = await response.json();
+    alert(result.analysis); 
+  };
         {report && (
           <div style={reportContainer}>
             <h2 style={{ color: '#f1c40f', borderBottom: '2px solid #f1c40f', paddingBottom: '10px' }}>Deep Diagnostic Report</h2>
@@ -195,3 +210,15 @@ const analysisItem = {
   borderBottom: '1px solid #222', 
   marginBottom: '10px' 
 };
+{/* বিদ্যমান ক্যালকুলেট বাটন */}
+<button onClick={analyzeVastu} style={submitBtnStyle}>
+  Calculate Full Vastu Score
+</button>
+
+{/* নতুন AI বাটন (এটি যোগ করুন) */}
+<button 
+  onClick={handleAiAnalysis} 
+  style={{...submitBtnStyle, background: '#4CAF50', marginLeft: '10px'}}
+>
+  Get AI Expert Opinion
+</button>
