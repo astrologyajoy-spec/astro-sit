@@ -10,12 +10,12 @@ export default async function handler(req, res) {
 
   try {
     const { data } = req.body;
-    const prompt = `Act as a Vastu Shastra expert. Analyze the following house layout data: ${JSON.stringify(data)}. Provide detailed remedies and practical advice in Bengali.`;
+    const prompt = `Act as a Vastu Shastra expert. Analyze the following house layout data: ${JSON.stringify(data)}. Provide detailed remedies and practical advice in Bengali language.`;
     
     const result = await model.generateContent(prompt);
     const response = await result.response;
     
-    // এই লাইনটি সবথেকে গুরুত্বপূর্ণ: await ব্যবহার করতে হবে
+    // নিচের এই অংশটুকু আমি আপনার জন্য ঠিক করে দিয়েছি
     const text = await response.text(); 
     
     res.status(200).json({ analysis: text });
