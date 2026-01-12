@@ -9,7 +9,6 @@ export default function Vastu() {
   const zones = ["North", "North-East", "East", "South-East", "South", "South-West", "West", "North-West"];
   const items = ["None", "Main Entrance", "Kitchen", "Toilet", "Master Bedroom", "Pooja Room"];
 
-  // Ekhane syntax error thik kora hoyeche
   const [selections, setSelections] = useState(
     zones.reduce((acc, zone) => ({ ...acc, [zone]: "None" }), {})
   );
@@ -23,7 +22,7 @@ export default function Vastu() {
       );
 
       if (Object.keys(filteredData).length === 0) {
-        alert("Doya kore ontoto ekti dik select korun!");
+        alert("দয়া করে অন্তত একটি দিক সিলেক্ট করুন!");
         setLoading(false);
         return;
       }
@@ -35,20 +34,20 @@ export default function Vastu() {
       });
 
       const result = await response.json();
-      if (result.analysis) {
+      if (response.ok && result.analysis) {
         setReport(result.analysis);
       } else {
-        alert(result.error || "AI report toiri korte pareni.");
+        alert(result.error || "এআই রিপোর্ট তৈরি করতে পারেনি।");
       }
     } catch (error) {
-      alert("Server-er sathe jogajog kora jachche na!");
+      alert("সার্ভারের সাথে যোগাযোগ করা সম্ভব হচ্ছে না!");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div style={{ background: '#090a0f', color: '#fff', minHeight: '100vh' }}>
+    <div style={{ background: '#090a0f', color: '#fff', minHeight: '100vh', fontFamily: 'Arial, sans-serif' }}>
       <Header />
       <main style={{ padding: '40px', textAlign: 'center' }}>
         <h1 style={{ color: '#f1c40f' }}>Vastu AI Expert (Bengali)</h1>
@@ -59,7 +58,7 @@ export default function Vastu() {
               <select 
                 value={selections[zone]} 
                 onChange={(e) => setSelections({...selections, [zone]: e.target.value})}
-                style={{ width: '100%', padding: '10px', marginTop: '10px', background: '#000', color: '#fff' }}
+                style={{ width: '100%', padding: '10px', marginTop: '10px', background: '#000', color: '#fff', borderRadius: '5px' }}
               >
                 {items.map(i => <option key={i} value={i}>{i}</option>)}
               </select>
@@ -69,14 +68,14 @@ export default function Vastu() {
         <button 
           onClick={handleAiAnalysis} 
           disabled={loading}
-          style={{ marginTop: '50px', padding: '15px 40px', background: loading ? '#555' : '#4CAF50', color: '#fff', borderRadius: '10px', cursor: 'pointer' }}
+          style={{ marginTop: '50px', padding: '15px 40px', background: loading ? '#555' : '#4CAF50', color: '#fff', borderRadius: '10px', cursor: 'pointer', fontWeight: 'bold' }}
         >
-          {loading ? "AI bishleshon korche..." : "Free Vastu Report Pan"}
+          {loading ? "AI বিশ্লেষণ করছে..." : "ফ্রি বাস্তু রিপোর্ট পান"}
         </button>
         {report && (
           <div style={{ marginTop: '40px', padding: '30px', background: '#1a1d23', border: '2px solid #4CAF50', borderRadius: '15px', textAlign: 'left', maxWidth: '800px', margin: '40px auto' }}>
-            <h3 style={{ color: '#4CAF50' }}>Apnar Vastu Report:</h3>
-            <div style={{ whiteSpace: 'pre-wrap', lineHeight: '1.8' }}>{report}</div>
+            <h3 style={{ color: '#4CAF50' }}>আপনার বাস্তু রিপোর্ট:</h3>
+            <div style={{ whiteSpace: 'pre-wrap', lineHeight: '1.8', marginTop: '20px' }}>{report}</div>
           </div>
         )}
       </main>
