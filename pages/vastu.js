@@ -34,13 +34,14 @@ export default function Vastu() {
       });
 
       const result = await response.json();
-      if (result.analysis) {
+      
+      if (response.ok && result.analysis) {
         setReport(result.analysis);
       } else {
-        alert(result.error || "রিপোর্ট তৈরি করা যায়নি।");
+        alert(result.error || "এআই রিপোর্ট তৈরি করতে পারেনি।");
       }
     } catch (error) {
-      alert("সার্ভারের সাথে যোগাযোগ করা যাচ্ছে না!");
+      alert("সার্ভারের সাথে যোগাযোগ করা সম্ভব হচ্ছে না!");
     } finally {
       setLoading(false);
     }
@@ -51,25 +52,31 @@ export default function Vastu() {
       <Header />
       <main style={{ padding: '40px', textAlign: 'center' }}>
         <h1 style={{ color: '#f1c40f' }}>Vastu AI Expert (Bengali)</h1>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', marginTop: '30px' }}>
           {zones.map(zone => (
-            <div key={zone} style={{ background: '#111', padding: '20px', borderRadius: '15px' }}>
-              <label>{zone}</label>
+            <div key={zone} style={{ background: '#111', padding: '20px', borderRadius: '15px', border: '1px solid #333' }}>
+              <label style={{ fontWeight: 'bold' }}>{zone}</label>
               <select 
                 value={selections[zone]} 
                 onChange={(e) => setSelections({...selections, [zone]: e.target.value})}
-                style={{ width: '100%', padding: '10px', marginTop: '10px' }}
+                style={{ width: '100%', padding: '10px', marginTop: '10px', background: '#000', color: '#fff' }}
               >
                 {items.map(i => <option key={i} value={i}>{i}</option>)}
               </select>
             </div>
           ))}
         </div>
-        <button onClick={handleAiAnalysis} disabled={loading} style={{ marginTop: '30px', padding: '15px 40px', background: '#4CAF50', color: '#fff', borderRadius: '10px', cursor: 'pointer' }}>
+
+        <button 
+          onClick={handleAiAnalysis} 
+          disabled={loading}
+          style={{ marginTop: '50px', padding: '15px 40px', background: loading ? '#555' : '#4CAF50', color: '#fff', borderRadius: '10px', cursor: 'pointer', fontWeight: 'bold' }}
+        >
           {loading ? "AI বিশ্লেষণ করছে..." : "ফ্রি বাস্তু রিপোর্ট পান"}
         </button>
+
         {report && (
-          <div style={{ marginTop: '40px', padding: '30px', background: '#1a1d23', border: '1px solid #4CAF50', borderRadius: '15px', textAlign: 'left' }}>
+          <div style={{ marginTop: '40px', padding: '30px', background: '#1a1d23', border: '2px solid #4CAF50', borderRadius: '15px', textAlign: 'left', maxWidth: '800px', margin: '40px auto' }}>
             <h3 style={{ color: '#4CAF50' }}>আপনার বাস্তু রিপোর্ট:</h3>
             <div style={{ whiteSpace: 'pre-wrap', lineHeight: '1.8' }}>{report}</div>
           </div>
