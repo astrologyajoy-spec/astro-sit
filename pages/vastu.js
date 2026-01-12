@@ -9,8 +9,10 @@ export default function Vastu() {
   const zones = ["North", "North-East", "East", "South-East", "South", "South-West", "West", "North-West"];
   const items = ["None", "Main Entrance", "Kitchen", "Toilet", "Master Bedroom", "Pooja Room"];
 
+  // Ekhane syntax error thik kora hoyeche
   const [selections, setSelections] = useState(
-    zones.reduce((acc, zone) => ({ ...acc, [zone]: "None" }), {})\n  );
+    zones.reduce((acc, zone) => ({ ...acc, [zone]: "None" }), {})
+  );
 
   const handleAiAnalysis = async () => {
     setLoading(true);
@@ -21,7 +23,7 @@ export default function Vastu() {
       );
 
       if (Object.keys(filteredData).length === 0) {
-        alert("দয়া করে অন্তত একটি দিক সিলেক্ট করুন!");
+        alert("Doya kore ontoto ekti dik select korun!");
         setLoading(false);
         return;
       }
@@ -36,10 +38,10 @@ export default function Vastu() {
       if (result.analysis) {
         setReport(result.analysis);
       } else {
-        alert(result.error || "এআই রিপোর্ট তৈরি করতে পারেনি।");
+        alert(result.error || "AI report toiri korte pareni.");
       }
     } catch (error) {
-      alert("সার্ভারের সাথে যোগাযোগ করা সম্ভব হচ্ছে না!");
+      alert("Server-er sathe jogajog kora jachche na!");
     } finally {
       setLoading(false);
     }
@@ -69,11 +71,11 @@ export default function Vastu() {
           disabled={loading}
           style={{ marginTop: '50px', padding: '15px 40px', background: loading ? '#555' : '#4CAF50', color: '#fff', borderRadius: '10px', cursor: 'pointer' }}
         >
-          {loading ? "AI বিশ্লেষণ করছে..." : "ফ্রি বাস্তু রিপোর্ট পান"}
+          {loading ? "AI bishleshon korche..." : "Free Vastu Report Pan"}
         </button>
         {report && (
           <div style={{ marginTop: '40px', padding: '30px', background: '#1a1d23', border: '2px solid #4CAF50', borderRadius: '15px', textAlign: 'left', maxWidth: '800px', margin: '40px auto' }}>
-            <h3 style={{ color: '#4CAF50' }}>আপনার বাস্তু রিপোর্ট:</h3>
+            <h3 style={{ color: '#4CAF50' }}>Apnar Vastu Report:</h3>
             <div style={{ whiteSpace: 'pre-wrap', lineHeight: '1.8' }}>{report}</div>
           </div>
         )}
