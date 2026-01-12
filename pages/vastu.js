@@ -5,13 +5,12 @@ import Footer from '../components/Footer';
 export default function Vastu() {
   const [report, setReport] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [selections, setSelections] = useState({
-    North: "None", "North-East": "None", East: "None", "South-East": "None",
-    South: "None", "South-West": "None", West: "None", "North-West": "None"
-  });
 
-  const zones = Object.keys(selections);
+  const zones = ["North", "North-East", "East", "South-East", "South", "South-West", "West", "North-West"];
   const items = ["None", "Main Entrance", "Kitchen", "Toilet", "Master Bedroom", "Pooja Room"];
+
+  const [selections, setSelections] = useState(
+    zones.reduce((acc, zone) => ({ ...acc, [zone]: "None" }), {})\n  );
 
   const handleAiAnalysis = async () => {
     setLoading(true);
@@ -34,8 +33,7 @@ export default function Vastu() {
       });
 
       const result = await response.json();
-      
-      if (response.ok && result.analysis) {
+      if (result.analysis) {
         setReport(result.analysis);
       } else {
         alert(result.error || "এআই রিপোর্ট তৈরি করতে পারেনি।");
@@ -66,15 +64,13 @@ export default function Vastu() {
             </div>
           ))}
         </div>
-
         <button 
           onClick={handleAiAnalysis} 
           disabled={loading}
-          style={{ marginTop: '50px', padding: '15px 40px', background: loading ? '#555' : '#4CAF50', color: '#fff', borderRadius: '10px', cursor: 'pointer', fontWeight: 'bold' }}
+          style={{ marginTop: '50px', padding: '15px 40px', background: loading ? '#555' : '#4CAF50', color: '#fff', borderRadius: '10px', cursor: 'pointer' }}
         >
           {loading ? "AI বিশ্লেষণ করছে..." : "ফ্রি বাস্তু রিপোর্ট পান"}
         </button>
-
         {report && (
           <div style={{ marginTop: '40px', padding: '30px', background: '#1a1d23', border: '2px solid #4CAF50', borderRadius: '15px', textAlign: 'left', maxWidth: '800px', margin: '40px auto' }}>
             <h3 style={{ color: '#4CAF50' }}>আপনার বাস্তু রিপোর্ট:</h3>
