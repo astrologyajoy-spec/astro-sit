@@ -27,7 +27,7 @@ export default function Vastu() {
         return;
       }
 
-      const response = await fetch('/api/gemini', {
+      const response = await fetch('/api/gemini.js', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ data: filteredData }),
