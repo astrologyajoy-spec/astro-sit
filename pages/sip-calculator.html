@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIP Calculator - আপনার ভবিষ্যতের সঞ্চয় হিসাব করুন</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; display: flex; justify-content: center; padding: 20px; }
+        .container { background: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 500px; }
+        h2 { text-align: center; color: #2c3e50; margin-bottom: 25px; }
+        .input-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: bold; color: #555; }
+        input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; font-size: 16px; }
+        button { width: 100%; padding: 15px; background-color: #27ae60; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 18px; transition: 0.3s; }
+        button:hover { background-color: #219150; }
+        .result { margin-top: 30px; padding: 20px; background: #e8f5e9; border-radius: 8px; display: none; }
+        .result p { margin: 10px 0; font-size: 16px; color: #333; }
+        .result span { font-weight: bold; color: #27ae60; float: right; }
+        canvas { margin-top: 20px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>SIP ক্যালকুলেটর 📈</h2>
+    
+    <div class="input-group">
+        <label>মাসিক বিনিয়োগ (টাকা):</label>
+        <input type="number" id="monthlyInvestment" placeholder="উদা: ৫০০০" value="5000">
+    </div>
+
+    <div class="input-group">
+        <label>প্রত্যাশিত রিটার্ন রেট (বার্ষিক %):</label>
+        <input type="number" id="annualRate" placeholder="উদা: ১২" value="12">
+    </div>
+
+    <div class="input-group">
+        <label>সময়কাল (বছর):</label>
+        <input type="number" id="years" placeholder="উদা: ১০" value="10">
+    </div>
+
+    <button onclick="calculateSIP()">হিসাব করুন</button>
+
+    <div class="result" id="resultArea">
+        <p>মোট বিনিয়োগ: <span id="totalInvested">০</span></p>
+        <p>আনুমানিক লাভ: <span id="estReturns">০</span></p>
+        <p>মোট মূল্য: <span id="totalValue">০</span></p>
+        <canvas id="myChart"></canvas>
+    </div>
+</div>
+
+<script>
+    let myChart;
+
+    function calculateSIP() {
+        const P = parseFloat(document.getElementById('monthlyInvestment').value);
+        const annualRate = parseFloat(document.getElementById('annualRate').value);
+        const n = parseFloat(document.getElementById('years').value) * 12;
+        const i = (annualRate / 100) / 12;
+
+        // SIP Formula: M = P × ({[1 + i]^n – 1} / i) × (1 + i)
+        const totalValue = P * ((Math.pow(1 + i, n) - 1) / i) * (1 + i);
+        const investedAmount = P * n;
+        const estimatedReturns = totalValue - investedAmount;
+
+        document.getElementById('totalInvested').innerText = Math.round(investedAmount).toLocaleString('en-IN');
+        document.getElementById('estReturns').innerText = Math.round(estimatedReturns).toLocaleString('en-IN');
+        document.getElementById('totalValue').innerText = Math.round(totalValue).toLocaleString('en-IN');
+        
+        document.getElementById('resultArea').style.display = 'block';
+
+        updateChart(investedAmount, estimatedReturns);
+    }
+
+    function updateChart(invested, returns) {
+        const ctx = document.getElementById('myChart').getContext('2d');
+        if (myChart) { myChart.destroy(); }
+        
+        myChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['বিনিয়োগ', 'লাভ'],
+                datasets: [{
+                    data: [invested, returns],
+                    backgroundColor: ['#bdc3c7', '#27ae60'],
+                    borderWidth: 1
+                }]
+            }
+        });
+    }
+</script>
+
+</body>
+</html>
