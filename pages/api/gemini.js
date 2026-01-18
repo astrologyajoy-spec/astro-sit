@@ -1,33 +1,40 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
-
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method Not Allowed' });
 
-  // Vercel Settings-এ GEMINI_API_KEY অবশ্যই থাকতে হবে
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) {
-    return res.status(500).json({ error: "API Key is missing in Vercel settings." });
-  }
+  const token = process.env.HUGGINGFACE_TOKEN;
+  if (!token) return res.status(500).json({ error: "Hugging Face Token missing!" });
+
+  const { data } = req.body;
+
+  // System Prompting: AI-কে বিশেষজ্ঞ জ্যোতিষী বানানো
+  const prompt = `<s>[INST] তুমি একজন অভিজ্ঞ বৈদিক জ্যোতিষী এবং বাস্তু বিশেষজ্ঞ। নিচের বাড়ির তথ্যগুলো বিশ্লেষণ করে বাংলায় একটি বিস্তারিত এবং সুন্দর বাস্তু রিপোর্ট তৈরি করো।
+তথ্য: ${JSON.stringify(data)} [/INST]</s>`;
 
   try {
-    const genAI = new GoogleGenerativeAI(apiKey);
-    
-    // মডেলের নাম 'gemini-1.5-flash' অথবা 'gemini-pro' ট্রাই করুন
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const response = await fetch(
+      "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.3",
+      {
+        headers: { 
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json" 
+        },
+        method: "POST",
+        body: JSON.stringify({ 
+          inputs: prompt,
+          parameters: { max_new_tokens: 600, temperature: 0.7 }
+        }),
+      }
+    );
 
-    const { data } = req.body;
-    const prompt = `তুমি একজন বাস্তু শাস্ত্র বিশেষজ্ঞ। নিচের বাড়ির ডেটা বিশ্লেষণ করো: ${JSON.stringify(data)}. একটি বিস্তারিত রিপোর্ট বাংলায় তৈরি করো।`;
+    const result = await response.json();
     
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const text = await response.text(); 
-    
-    if (!text) throw new Error("Empty response from AI");
+    // AI-এর উত্তর থেকে অপ্রয়োজনীয় অংশ বাদ দেওয়া
+    const rawText = result[0]?.generated_text || "";
+    const analysis = rawText.split("[/INST]")[1] || rawText;
 
-    res.status(200).json({ analysis: text });
+    res.status(200).json({ analysis: analysis.trim() });
   } catch (error) {
-    console.error("Gemini API Error:", error);
-    // সঠিক এরর মেসেজ পাঠানো হচ্ছে যাতে কারণ বোঝা যায়
-    res.status(500).json({ error: "AI সার্ভিস কাজ করছে না। দয়া করে API Key চেক করুন।" });
+    console.error("HF Error:", error);
+    res.status(500).json({ error: "AI এখন ব্যস্ত আছে, ১ মিনিট পর আবার চেষ্টা করুন।" });
   }
 }
